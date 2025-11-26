@@ -108,7 +108,7 @@ const login = async (req, res) => {
 
     // Check if user exists
     if (!user) {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
       });
@@ -117,7 +117,7 @@ const login = async (req, res) => {
     // Check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
       });

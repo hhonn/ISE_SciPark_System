@@ -16,6 +16,11 @@ export const generateBookingQRCode = async (booking) => {
     // Create secure token
     const token = crypto.randomBytes(32).toString('hex');
     
+    // QR expires at checkInDeadline or 24 hours if no deadline
+    const expiresAt = booking.checkInDeadline 
+      ? new Date(booking.checkInDeadline).getTime()
+      : Date.now() + (24 * 60 * 60 * 1000); // 24 hours default
+    
     // QR payload with booking information
     const qrPayload = {
       bookingId: booking._id.toString(),
@@ -23,7 +28,7 @@ export const generateBookingQRCode = async (booking) => {
       spotId: booking.spot.toString(),
       token: token,
       timestamp: Date.now(),
-      expiresAt: new Date(booking.endTime).getTime()
+      expiresAt: expiresAt
     };
 
     // Convert to JSON string
@@ -45,7 +50,7 @@ export const generateBookingQRCode = async (booking) => {
     return {
       qrCodeDataURL,
       token,
-      expiresAt: qrPayload.expiresAt
+      expiresAt: expiresAt
     };
 
   } catch (error) {
@@ -63,13 +68,18 @@ export const generateBookingQRCodeBuffer = async (booking) => {
   try {
     const token = crypto.randomBytes(32).toString('hex');
     
+    // QR expires at checkInDeadline or 24 hours if no deadline
+    const expiresAt = booking.checkInDeadline 
+      ? new Date(booking.checkInDeadline).getTime()
+      : Date.now() + (24 * 60 * 60 * 1000); // 24 hours default
+    
     const qrPayload = {
       bookingId: booking._id.toString(),
       userId: booking.user.toString(),
       spotId: booking.spot.toString(),
       token: token,
       timestamp: Date.now(),
-      expiresAt: new Date(booking.endTime).getTime()
+      expiresAt: expiresAt
     };
 
     const qrData = JSON.stringify(qrPayload);
@@ -86,7 +96,7 @@ export const generateBookingQRCodeBuffer = async (booking) => {
     return {
       buffer: qrCodeBuffer,
       token,
-      expiresAt: qrPayload.expiresAt
+      expiresAt: expiresAt
     };
 
   } catch (error) {

@@ -11,7 +11,7 @@ import { LoadingSpinner } from '../components/ui/Loading'
 
 const Home = () => {
   const { user } = useAuthStore()
-  const { activeBooking } = useBookingStore()
+  const { activeBooking, setActiveBooking } = useBookingStore()
   const [parkingSpots, setParkingSpots] = useState([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({

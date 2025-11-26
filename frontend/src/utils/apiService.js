@@ -24,7 +24,7 @@ export const bookingAPI = {
   createBooking: (bookingData) => api.post('/bookings', bookingData),
   getActiveBooking: () => api.get('/bookings/active'),
   getHistory: (limit = 10) => api.get(`/bookings/history?limit=${limit}`),
-  cancelBooking: (bookingId) => api.put(`/bookings/${bookingId}/cancel`),
+  cancelBooking: (bookingId) => api.delete(`/bookings/${bookingId}`),
   completeBooking: (bookingId) => api.put(`/bookings/${bookingId}/complete`),
   extendBooking: (bookingId, hours) => api.put(`/bookings/${bookingId}/extend`, { hours }),
   checkIn: (bookingId) => api.put(`/bookings/${bookingId}/checkin`),
@@ -33,7 +33,7 @@ export const bookingAPI = {
 
 // Privileges APIs
 export const privilegesAPI = {
-  getTiers: () => api.get('/privileges/tiers'),
+  getTiers: () => api.get('/privileges'),
   getPromos: () => api.get('/privileges/promos'),
   subscribe: (tierId, paymentMethod = 'credit') => api.post('/privileges/subscribe', { tierId, paymentMethod }),
   redeemCode: (code) => api.post('/privileges/redeem', { code }),
@@ -52,6 +52,6 @@ export const vehicleAPI = {
 export const userAPI = {
   getProfile: () => api.get('/user/profile'),
   updateProfile: (userData) => api.put('/user/profile', userData),
-  changePassword: (passwords) => api.put('/user/password', passwords),
+  changePassword: (passwords) => api.put('/user/change-password', passwords),
   getBookingHistory: (limit = 20) => api.get(`/user/bookings?limit=${limit}`),
 }

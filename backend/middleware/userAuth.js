@@ -34,4 +34,4 @@ const userAuth = (req, res, next) => {
 // Export with both names for compatibility
 export default userAuth;
 export { userAuth as authenticateUser };
-
+export { userAuth as protect };

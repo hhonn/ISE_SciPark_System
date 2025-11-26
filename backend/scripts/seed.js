@@ -22,29 +22,32 @@ const seedDatabase = async () => {
   try {
     console.log("🌱 Starting database seeding...");
 
-    // Clear existing data
+    // Clear existing data (รวมถึง users)
     await ParkingZone.deleteMany({});
     await ParkingSpot.deleteMany({});
     await PromoCode.deleteMany({});
+    await User.deleteMany({}); // ลบ users ด้วยเพื่อให้สร้างใหม่ได้
     console.log("🗑️  Cleared existing data");
 
-    // Create Parking Zones
+    // Create Parking Zones (ลานจอดรถทั้งหมด - ไม่มีชั้น)
     const zones = [
       {
         zoneName: "CHULA",
-        name: "หน้าตึกจุฬาภรณวลัยลักษณ์",
-        description: "ลานจอดรถหน้าตึกจุฬาภรณวลัยลักษณ์ ใกล้ทางเข้าหลัก",
-        building: "ตึกจุฬาภรณวลัยลักษณ์",
+        name: "หน้าตึกจุฬาภรณวลัยลักษณ์ 1",
+        description: "ลานจอดรถหน้าตึกจุฬาภรณวลัยลักษณ์ 1 ใกล้ทางเข้าหลัก",
+        building: "ตึกจุฬาภรณวลัยลักษณ์ 1",
         totalSpots: 30,
-        hourlyRate: 20,
+        hourlyRate: 10,
+        isOpenLot: true, // เป็นลานจอด ไม่มีชั้น
       },
       {
         zoneName: "PRAJOM",
         name: "ใต้ตึกพระจอมเกล้า",
-        description: "ลานจอดรถใต้ตึกพระจอมเกล้า ป้องกันแดดฝน",
+        description: "ลานจอดรถใต้ตึกพระจอมเกล้า ชั้น G ป้องกันแดดฝน",
         building: "ตึกพระจอมเกล้า",
         totalSpots: 25,
-        hourlyRate: 20,
+        hourlyRate: 10,
+        isOpenLot: true, // เป็นลานจอด ไม่มีชั้น (ชั้น G)
       },
       {
         zoneName: "BEHIND",
@@ -52,7 +55,8 @@ const seedDatabase = async () => {
         description: "ลานจอดรถด้านหลังคณะวิทยาศาสตร์ มีต้นไม้ร่มรื่น",
         building: "คณะวิทยาศาสตร์",
         totalSpots: 35,
-        hourlyRate: 20,
+        hourlyRate: 10,
+        isOpenLot: true, // เป็นลานจอด ไม่มีชั้น
       },
       {
         zoneName: "DEAN",
@@ -60,7 +64,8 @@ const seedDatabase = async () => {
         description: "ลานจอดรถหน้าตึกคณบดี สะดวกสบาย มีที่จอดเยอะ",
         building: "ตึกคณบดีคณะวิทยาศาสตร์",
         totalSpots: 20,
-        hourlyRate: 20,
+        hourlyRate: 10,
+        isOpenLot: true, // เป็นลานจอด ไม่มีชั้น
       },
       {
         zoneName: "FRONT",
@@ -68,14 +73,15 @@ const seedDatabase = async () => {
         description: "ลานจอดรถหน้าคณะวิทยาศาสตร์ ใกล้ประตูหลัก",
         building: "คณะวิทยาศาสตร์",
         totalSpots: 30,
-        hourlyRate: 20,
+        hourlyRate: 10,
+        isOpenLot: true, // เป็นลานจอด ไม่มีชั้น
       },
     ];
 
     const createdZones = await ParkingZone.insertMany(zones);
     console.log(`✅ Created ${createdZones.length} parking zones`);
 
-    // Create Parking Spots
+    // Create Parking Spots (ทุกที่จอดเป็นลานจอด - ไม่มีชั้น)
     const spotFacilities = [
       ["CCTV", "ร่มเงา", "ใกล้ทางเข้า"],
       ["CCTV", "ไฟส่องสว่าง"],
@@ -84,43 +90,48 @@ const seedDatabase = async () => {
       ["CCTV"],
     ];
 
-    const floors = ["ชั้น 1", "ชั้น 2", "ชั้น 3", "ชั้น B1"];
+    // ชื่อแถว A, B, C, D, E สำหรับสร้างเลขที่จอด
+    const rowNames = ["A", "B", "C", "D", "E"];
 
     let allSpots = [];
     let spotCounter = 1;
 
     for (const zone of createdZones) {
       const spotsInZone = zone.totalSpots;
+      const spotsPerRow = Math.ceil(spotsInZone / rowNames.length);
 
-      for (let i = 1; i <= spotsInZone; i++) {
-        const spotNumber = `${zone.zoneName[0]}${String(i).padStart(2, "0")}`;
-        const floor = floors[Math.floor(Math.random() * floors.length)];
-        const facilities =
-          spotFacilities[Math.floor(Math.random() * spotFacilities.length)];
-        const pricePerHour = zone.hourlyRate;
+      let spotIndex = 0;
+      for (let row = 0; row < rowNames.length && spotIndex < spotsInZone; row++) {
+        for (let col = 0; col < spotsPerRow && spotIndex < spotsInZone; col++) {
+          const spotNumber = `${rowNames[row]}${col}`;
+          const facilities =
+            spotFacilities[Math.floor(Math.random() * spotFacilities.length)];
+          const pricePerHour = zone.hourlyRate;
 
-        // Randomly set some spots as occupied or reserved
-        let status = "available";
-        const random = Math.random();
-        if (random < 0.15) {
-          status = "occupied";
-        } else if (random < 0.20) {
-          status = "reserved";
+          // Randomly set some spots as occupied or reserved
+          let status = "available";
+          const random = Math.random();
+          if (random < 0.15) {
+            status = "occupied";
+          } else if (random < 0.20) {
+            status = "reserved";
+          }
+
+          allSpots.push({
+            spotNumber,
+            name: `ช่อง ${spotNumber}`,
+            zone: zone._id,
+            zoneName: zone.zoneName,
+            floor: "ลานจอด", // ทุกที่จอดเป็นลานจอด
+            building: zone.building,
+            status,
+            pricePerHour,
+            facilities,
+          });
+
+          spotIndex++;
+          spotCounter++;
         }
-
-        allSpots.push({
-          spotNumber,
-          name: `ช่องจอด ${spotNumber}`,
-          zone: zone._id,
-          zoneName: zone.zoneName,
-          floor,
-          building: zone.building,
-          status,
-          pricePerHour,
-          facilities,
-        });
-
-        spotCounter++;
       }
     }
 

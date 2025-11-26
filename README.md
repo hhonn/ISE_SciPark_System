@@ -130,8 +130,8 @@ ise-scipark/
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/Kittamets/ise-scipark.git
-cd ise-scipark
+git clone https://github.com/hhonn/ISE_SciPark_System.git
+cd ISE_SciPark_System
 ```
 
 ### 2. Setup Backend
@@ -314,10 +314,9 @@ DELETE /api/vehicles/:id       # Delete vehicle
 ## 📞 Contact & Support
 
 ```
-📧 Email:    scipark@kmutt.ac.th
-🌐 Website:  https://scipark.kmutt.ac.th
-📱 GitHub:   https://github.com/Kittamets/ise-scipark
-📍 Location: คณะวิทยาศาสตร์ มจธ.
+📧 Author:   Nattawut Chaturaponkul
+📱 GitHub:   https://github.com/hhonn/ISE_SciPark_System
+📍 Location: คณะวิทยาศาสตร์ สจล.
 ```
 
 ---
@@ -374,9 +373,9 @@ MIT License - สามารถนำไปใช้ต่อยอดได้
 
 ```bash### 2️⃣ Setup MongoDB Atlas (ฟรี!)
 
-git clone https://github.com/Kittamets/ise-scipark.git
+git clone https://github.com/hhonn/ISE_SciPark_System.git
 
-cd ise-sciparkดูคำแนะนำใน [INSTALL.md](INSTALL.md)
+cd ISE_SciPark_Systemดูคำแนะนำใน [INSTALL.md](INSTALL.md)
 
 ```
 
@@ -717,8 +716,9 @@ This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
-**Kittamets, Nattawut, Pacharapon**
-- GitHub: [@Kittamets](https://github.com/Kittamets)
+**Nattawut Chaturaponkul**
+- GitHub: [@hhonn](https://github.com/hhonn)
+- Project: ISE SciPark System
 
 ---
 

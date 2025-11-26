@@ -7,13 +7,14 @@ import User from '../models/userModel.js';
  * Auto-Cancel Reservation Service
  * 
  * ยกเลิกการจองอัตโนมัติหากผู้ใช้ไม่เข้ามา check-in ภายในเวลาที่กำหนด
- * - Grace Period: 15 นาที
+ * - Grace Period: 30 นาที (ตาม Requirements)
  * - Check Interval: ทุก 5 นาที
- * - Status: active -> cancelled
+ * - Status: pending -> cancelled
  * - Spot Status: occupied -> available
+ * - ค่าจอง 20 บาทไม่คืน
  */
 
-const GRACE_PERIOD_MINUTES = 15; // 15 นาทีหลังจอง
+const GRACE_PERIOD_MINUTES = 30; // 30 นาทีหลังจอง (ตาม Requirements)
 const CHECK_INTERVAL = '*/5 * * * *'; // ทุก 5 นาที
 
 /**
@@ -22,16 +23,14 @@ const CHECK_INTERVAL = '*/5 * * * *'; // ทุก 5 นาที
 export const autoCancelExpiredBookings = async () => {
   try {
     const now = new Date();
-    const timeoutDate = new Date(now.getTime() - GRACE_PERIOD_MINUTES * 60 * 1000);
 
     console.log(`[AutoCancel] Checking for expired bookings... (Timeout: ${GRACE_PERIOD_MINUTES} min)`);
 
-    // หาการจองที่ active และยังไม่ได้ check-in (ไม่มี actualStartTime)
-    // และเกินเวลา grace period แล้ว
+    // หาการจองที่ pending และเกินเวลา check-in deadline แล้ว
     const expiredBookings = await Booking.find({
-      status: 'active',
-      startTime: { $lt: timeoutDate }, // เกิน 15 นาที
-      actualStartTime: { $exists: false } // ยังไม่ check-in
+      status: 'pending',
+      checkInDeadline: { $lt: now }, // เกิน deadline
+      isCheckedIn: false // ยังไม่ check-in
     }).populate('user', 'name email username')
       .populate('spot', 'spotNumber name');
 
@@ -52,6 +51,7 @@ export const autoCancelExpiredBookings = async () => {
         booking.status = 'cancelled';
         booking.endTime = now;
         booking.cancelReason = 'auto_cancelled_timeout';
+        booking.refundable = false; // ค่าจอง 20 บาทไม่คืน
         await booking.save();
 
         // Free up the parking spot
@@ -64,7 +64,7 @@ export const autoCancelExpiredBookings = async () => {
 
         console.log(
           `[AutoCancel] ✓ Cancelled booking ${booking._id} ` +
-          `(User: ${booking.user?.username}, Spot: ${booking.spot?.spotNumber})`
+          `(User: ${booking.user?.username}, Spot: ${booking.spot?.spotNumber}, Fee: ${booking.bookingFee} THB - NOT REFUNDED)`
         );
 
         // TODO: Send notification to user (email/push)
@@ -107,7 +107,8 @@ export const startAutoCancelScheduler = () => {
   console.log('🚀 Starting Auto-Cancel Scheduler');
   console.log('=================================');
   console.log(`⏱️  Grace Period: ${GRACE_PERIOD_MINUTES} minutes`);
-  console.log(`🔄 Check Interval: Every 5 minutes`);
+  console.log(`� Booking Fee: 20 THB (non-refundable)`);
+  console.log(`�🔄 Check Interval: Every 5 minutes`);
   console.log('=================================');
 
   // ตั้ง cron job ให้ทำงานทุก 5 นาที

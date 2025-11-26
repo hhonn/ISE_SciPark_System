@@ -1,45 +1,75 @@
+# ===========================================
+# Render.com Deployment Configuration
+# ===========================================
+# Option 1: Full-Stack Single Service (Recommended)
+# Backend serves both API and Frontend static files
+
 services:
-  # Backend API
   - type: web
-    name: scipark-backend
-    env: node
+    name: scipark
+    runtime: node
     region: singapore
-    buildCommand: cd backend && npm install
+    plan: free
+    rootDir: ./
+    buildCommand: npm install && cd frontend && npm install && npm run build && cd ../backend && npm install
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
-      - key: MONGO_URI
-        sync: false
+      - key: MONGODB_URI
+        sync: false  # Set manually in Render dashboard
       - key: JWT_SECRET
         generateValue: true
-      - key: CLIENT_URL
+      - key: REDIS_URL
+        sync: false  # Optional: Set if using Redis
+      - key: BREVO_USER
         sync: false
-      - key: EMAIL_HOST
-        sync: false
-      - key: EMAIL_PORT
-        value: 587
-      - key: EMAIL_USER
-        sync: false
-      - key: EMAIL_PASS
-        sync: false
-      - key: EMAIL_FROM
+      - key: BREVO_PASS
         sync: false
     healthCheckPath: /health
+    autoDeploy: true
 
-  # Frontend Static Site
-  - type: web
-    name: scipark-frontend
-    env: static
-    region: singapore
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+# ===========================================
+# Option 2: Separate Services (Alternative)
+# Uncomment below if you want separate deployments
+# ===========================================
+
+# services:
+#   # Backend API
+#   - type: web
+#     name: scipark-api
+#     runtime: node
+#     region: singapore
+#     rootDir: backend
+#     buildCommand: npm install
+#     startCommand: npm start
+#     envVars:
+#       - key: NODE_ENV
+#         value: production
+#       - key: PORT
+#         value: 3000
+#       - key: MONGODB_URI
+#         sync: false
+#       - key: JWT_SECRET
+#         generateValue: true
+#       - key: CLIENT_URL
+#         sync: false  # Set to frontend URL
+#     healthCheckPath: /health
+#
+#   # Frontend Static Site
+#   - type: web
+#     name: scipark-web
+#     runtime: static
+#     region: singapore
+#     rootDir: frontend
+#     buildCommand: npm install && npm run build
+#     staticPublishPath: dist
+#     envVars:
+#       - key: VITE_API_URL
+#         sync: false  # Set to backend URL
+#     routes:
+#       - type: rewrite
+#         source: /*
+#         destination: /index.html

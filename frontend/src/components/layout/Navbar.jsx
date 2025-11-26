@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Car, Menu, Home, Trophy, MapPin, Bell, User } from 'lucide-react'
+import { Car, Menu, Home, Trophy, MapPin, User } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import { useBookingStore } from '../../stores/bookingStore'
+import NotificationDropdown from '../NotificationDropdown'
 
 const Navbar = ({ onMenuClick }) => {
   const location = useLocation()
@@ -89,18 +90,7 @@ const Navbar = ({ onMenuClick }) => {
           {/* Right Actions */}
           <div className="flex items-center gap-3">
             {/* Notifications */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="relative p-3 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <Bell className="w-6 h-6 text-gray-600" />
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white"
-              />
-            </motion.button>
+            <NotificationDropdown />
             
             {/* Profile */}
             <Link to="/app/profile">

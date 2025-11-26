@@ -7,6 +7,9 @@ import rateLimit from "express-rate-limit"
 import morgan from "morgan"
 import mongoSanitize from "express-mongo-sanitize"
 import xss from "xss-clean"
+import path from "path"
+import fs from "fs"
+import { fileURLToPath } from 'url'
 
 import connectDB from "./config/db.js"
 import { initializeRedis, closeRedis } from "./config/redis.js"
@@ -19,6 +22,11 @@ import parkingRouter from "./routes/parkingRoute.js"
 import privilegesRouter from "./routes/privilegesRoute.js"
 import userRouter from "./routes/userRoutes.js"
 import paymentMethodRouter from "./routes/paymentMethodRoutes.js"
+import notificationRouter from "./routes/notificationRoutes.js"
+
+// ES Module fix for __dirname
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -71,10 +79,13 @@ app.use('/api', limiter);
 // Request logging
 app.use(morgan('dev'));
 
-// Test route
-app.get('/', (req, res) => {
-        console.log(req.originalUrl);
-        res.send("APIs is currently running...");
+// API Root route
+app.get('/api', (req, res) => {
+  res.send({
+    message: "SciPark API is running",
+    version: "1.0.0",
+    docs: "/docs"
+  });
 });
 
 // Health Check endpoint
@@ -119,6 +130,48 @@ app.use('/api/privileges', privilegesRouter);
 app.use('/api/user', userRouter);
 // Payment Method routes
 app.use('/api/payment-methods', paymentMethodRouter);
+// Notification routes
+app.use('/api/notifications', notificationRouter);
+
+// ============================================
+// Serve Frontend Static Files
+// ============================================
+// Check for frontend build in multiple locations
+const possiblePaths = [
+  path.join(__dirname, '../frontend/dist'),     // Standard deployment
+  path.join(__dirname, 'frontend-dist'),        // Docker deployment
+  path.join(__dirname, '../frontend-dist'),     // Alternative
+];
+
+let frontendPath = null;
+for (const p of possiblePaths) {
+  if (fs.existsSync(p)) {
+    frontendPath = p;
+    console.log(`📁 Serving frontend from: ${p}`);
+    break;
+  }
+}
+
+if (frontendPath) {
+  // Serve static files from the frontend build directory
+  app.use(express.static(frontendPath));
+  
+  // Handle React Router - serve index.html for all non-API routes
+  // Use RegExp to match all routes (Express 5 compatible)
+  app.get(/.*/, (req, res) => {
+    // Don't serve index.html for API routes
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+} else {
+  console.log('⚠️  Frontend build not found. Running API-only mode.');
+  // Fallback root route if frontend is not available
+  app.get('/', (req, res) => {
+    res.send("SciPark API is running... (Frontend not found)");
+  });
+}
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {

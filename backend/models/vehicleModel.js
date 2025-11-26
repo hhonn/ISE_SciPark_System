@@ -4,18 +4,22 @@ const vehicleSchema = new mongoose.Schema(
   {
     licensePlate: {
       type: String,
-      required: [true, "Please provide a license plate"],
-      unique: true,
+      required: [true, "กรุณากรอกป้ายทะเบียน"],
       trim: true,
     },
     brand: {
       type: String,
-      required: [true, "Please provide the vehicle brand"],
+      required: [true, "กรุณากรอกยี่ห้อรถ"],
       trim: true,
     },
     model: {
       type: String,
-      required: [true, "Please provide the vehicle model"],
+      required: [true, "กรุณากรอกรุ่นรถ"],
+      trim: true,
+    },
+    color: {
+      type: String,
+      default: "",
       trim: true,
     },
     userId: {
@@ -24,11 +28,18 @@ const vehicleSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Compound index for unique license plate per user
+vehicleSchema.index({ licensePlate: 1, userId: 1 }, { unique: true });
 
 const Vehicle = mongoose.models.Vehicle || mongoose.model("Vehicle", vehicleSchema);
 

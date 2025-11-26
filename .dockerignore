@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+*/node_modules
+
+# Development files
+.git
+.gitignore
+*.md
+.env
+.env.local
+.env.*.local
+
+# Build artifacts (will be built in Docker)
+frontend/dist
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test
+coverage
+.nyc_output
+
+# Docs
+docs

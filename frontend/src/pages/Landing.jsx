@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Car, MapPin, Trophy, CheckCircle, Star, ArrowRight, Zap, Shield, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { Car, MapPin, Trophy, CheckCircle, Star, ArrowRight, Zap, Shield, Clock, X, Smartphone, CreditCard, QrCode, Bell, Search, CarFront } from 'lucide-react'
 import Button from '../components/ui/Button'
 
 const Landing = () => {
+  const [showHowToUse, setShowHowToUse] = useState(false)
+  
   const features = [
     {
       icon: Zap,
@@ -120,11 +123,9 @@ const Landing = () => {
                     เริ่มต้นใช้งานฟรี
                   </Button>
                 </Link>
-                <a href="#features">
-                  <Button variant="secondary" size="lg">
-                    เรียนรู้เพิ่มเติม
-                  </Button>
-                </a>
+                <Button variant="secondary" size="lg" onClick={() => setShowHowToUse(true)}>
+                  เรียนรู้เพิ่มเติม
+                </Button>
               </motion.div>
             </motion.div>
             
@@ -304,6 +305,154 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* How to Use Modal */}
+      {showHowToUse && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowHowToUse(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between rounded-t-3xl">
+              <h2 className="text-3xl font-bold gradient-text">วิธีใช้งาน SciPark</h2>
+              <button
+                onClick={() => setShowHowToUse(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-8">
+              {/* Step 1 */}
+              <div className="flex gap-6 items-start">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  1
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Smartphone className="w-6 h-6 text-blue-500" />
+                    <h3 className="text-xl font-bold">ลงทะเบียน & เข้าสู่ระบบ</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    สมัครสมาชิกด้วย Email หรือ Username ของคุณ เพียงไม่กี่ขั้นตอน 
+                    คุณก็พร้อมใช้งานระบบจองที่จอดรถอัจฉริยะของเราได้ทันที
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex gap-6 items-start">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  2
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Search className="w-6 h-6 text-green-500" />
+                    <h3 className="text-xl font-bold">เลือกโซนที่จอดรถ</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    ดูจำนวนที่ว่างแบบ Real-time ในแต่ละโซน เลือกโซนที่ใกล้จุดหมายของคุณมากที่สุด
+                    ระบบจะแสดงจำนวนที่ว่างและราคาอย่างชัดเจน
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex gap-6 items-start">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  3
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <CarFront className="w-6 h-6 text-orange-500" />
+                    <h3 className="text-xl font-bold">ยืนยันการจอง</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    กดจองที่จอด ระบบจะจองที่ให้คุณทันที! คุณมีเวลา 30 นาทีในการเดินทางมาถึงที่จอด
+                    ค่าจอง 20 บาท/ครั้ง และ 3 ชั่วโมงแรกฟรี!
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className="flex gap-6 items-start">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  4
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <QrCode className="w-6 h-6 text-purple-500" />
+                    <h3 className="text-xl font-bold">Check-in ด้วย QR Code</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    เมื่อถึงที่จอดแล้ว กด Check-in เพื่อยืนยันว่าคุณมาถึง 
+                    ระบบจะเริ่มนับเวลาจอดจากตรงนี้ (3 ชม.แรกฟรี!)
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 5 */}
+              <div className="flex gap-6 items-start">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  5
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <CreditCard className="w-6 h-6 text-pink-500" />
+                    <h3 className="text-xl font-bold">Check-out & ชำระเงิน</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    เมื่อจอดเสร็จ กด Check-out ระบบจะคำนวณค่าจอดให้อัตโนมัติ
+                    3 ชม.แรกฟรี หลังจากนั้น 10 บาท/ชม. สมาชิกระดับสูงได้ส่วนลดเพิ่ม!
+                  </p>
+                </div>
+              </div>
+
+              {/* Pricing Info */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Bell className="w-6 h-6 text-blue-500" />
+                  อัตราค่าบริการ
+                </h3>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                    <p className="text-3xl font-bold text-blue-600">20฿</p>
+                    <p className="text-gray-600 text-sm">ค่าจอง/ครั้ง</p>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                    <p className="text-3xl font-bold text-green-600">ฟรี!</p>
+                    <p className="text-gray-600 text-sm">3 ชม.แรก</p>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                    <p className="text-3xl font-bold text-orange-600">10฿</p>
+                    <p className="text-gray-600 text-sm">ต่อชม. (หลัง 3 ชม.)</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="text-center pt-4">
+                <Link to="/register" onClick={() => setShowHowToUse(false)}>
+                  <Button variant="primary" size="lg" icon={ArrowRight}>
+                    เริ่มต้นใช้งานเลย!
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   )
 }

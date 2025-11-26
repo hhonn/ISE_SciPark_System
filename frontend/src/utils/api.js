@@ -12,9 +12,15 @@ const api = axios.create({
   withCredentials: true, // Important: Send cookies for JWT authentication
 })
 
-// Request interceptor (cookies are sent automatically via withCredentials)
+// Request interceptor - add Authorization header from store if available
 api.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    const token = useAuthStore.getState().token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
   (error) => Promise.reject(error)
 )
 

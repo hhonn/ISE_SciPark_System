@@ -34,10 +34,10 @@ const Login = () => {
         password: formData.password
       })
       
-      const { user } = response.data
+      const { user, token } = response.data
       
-      // Save user to store (token is in cookie)
-      login(user)
+      // Save user and token to store (token is also in cookie)
+      login(user, token)
       
       toast.success('เข้าสู่ระบบสำเร็จ! 🎉')
       
@@ -45,7 +45,7 @@ const Login = () => {
       
     } catch (error) {
       console.error('Login error:', error)
-      toast.error(error.response?.data?.error || 'เข้าสู่ระบบไม่สำเร็จ')
+      toast.error(error.response?.data?.message || error.response?.data?.error || 'เข้าสู่ระบบไม่สำเร็จ')
     } finally {
       setLoading(false)
     }
@@ -170,18 +170,6 @@ const Login = () => {
               นโยบายความเป็นส่วนตัว
             </Link>
           </div>
-        </motion.div>
-
-        {/* Demo Credentials */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-white text-sm"
-        >
-          <p className="font-semibold mb-2">🧪 ทดสอบระบบ:</p>
-          <p>Username: <span className="font-mono bg-white/20 px-2 py-1 rounded">testuser</span></p>
-          <p>Password: <span className="font-mono bg-white/20 px-2 py-1 rounded">test1234</span></p>
         </motion.div>
       </motion.div>
     </div>

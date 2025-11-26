@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Crown, Star, Zap, Shield, Gift, Check, Sparkles } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
+import { privilegesAPI } from '../utils/apiService'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
@@ -88,14 +89,17 @@ const Privileges = () => {
     setLoading(true)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const response = await privilegesAPI.subscribe(selectedPlan.id, 'credit')
       
-      // Update user rank
-      updateUser({ 
-        rank: selectedPlan.name,
-        subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
-      })
+      // Update user rank from response or use selected plan
+      if (response.data?.user) {
+        updateUser(response.data.user)
+      } else {
+        updateUser({ 
+          rank: selectedPlan.name,
+          subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+        })
+      }
       
       toast.success(`🎉 ยินดีด้วย! คุณได้รับสิทธิ์ ${selectedPlan.name} แล้ว`)
       setShowUpgradeModal(false)
@@ -103,7 +107,7 @@ const Privileges = () => {
       
     } catch (error) {
       console.error('Upgrade error:', error)
-      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่')
+      toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่')
     } finally {
       setLoading(false)
     }
@@ -118,25 +122,20 @@ const Privileges = () => {
     setLoading(true)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const response = await privilegesAPI.redeemCode(redeemCode.trim())
       
-      // Mock code validation
-      if (redeemCode.toUpperCase() === 'SCIPARK2024') {
-        updateUser({ 
-          rank: 'Diamond',
-          subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        })
-        toast.success('🎉 แลกโค้ดสำเร็จ! คุณได้รับ Diamond Tier 1 เดือน')
-        setShowRedeemModal(false)
-        setRedeemCode('')
-      } else {
-        toast.error('โค้ดไม่ถูกต้องหรือหมดอายุแล้ว')
+      // Update user from response
+      if (response.data?.user) {
+        updateUser(response.data.user)
       }
+      
+      toast.success(response.data?.message || '🎉 แลกโค้ดสำเร็จ!')
+      setShowRedeemModal(false)
+      setRedeemCode('')
       
     } catch (error) {
       console.error('Redeem error:', error)
-      toast.error('เกิดข้อผิดพลาด')
+      toast.error(error.response?.data?.message || 'โค้ดไม่ถูกต้องหรือหมดอายุแล้ว')
     } finally {
       setLoading(false)
     }

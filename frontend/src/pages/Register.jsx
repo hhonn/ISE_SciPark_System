@@ -10,6 +10,7 @@ import Input from '../components/ui/Input'
 const Register = () => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     username: '',
     password: '',
@@ -23,6 +24,10 @@ const Register = () => {
 
   const validate = () => {
     const newErrors = {}
+    
+    if (!formData.name) {
+      newErrors.name = 'กรุณากรอกชื่อ-นามสกุล'
+    }
     
     if (!formData.email) {
       newErrors.email = 'กรุณากรอกอีเมล'
@@ -38,8 +43,8 @@ const Register = () => {
     
     if (!formData.password) {
       newErrors.password = 'กรุณากรอกรหัสผ่าน'
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร'
     }
     
     if (formData.password !== formData.confirmPassword) {
@@ -62,6 +67,7 @@ const Register = () => {
     
     try {
       const response = await authAPI.register({
+        name: formData.name,
         email: formData.email,
         username: formData.username,
         password: formData.password,
@@ -76,7 +82,7 @@ const Register = () => {
       
     } catch (error) {
       console.error('Register error:', error)
-      toast.error(error.response?.data?.error || 'ลงทะเบียนไม่สำเร็จ')
+      toast.error(error.response?.data?.message || error.response?.data?.error || 'ลงทะเบียนไม่สำเร็จ')
     } finally {
       setLoading(false)
     }
@@ -116,6 +122,17 @@ const Register = () => {
           
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
+              label="ชื่อ-นามสกุล"
+              type="text"
+              icon={User}
+              placeholder="กรอกชื่อ-นามสกุลของคุณ"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              error={errors.name}
+              required
+            />
+            
+            <Input
               label="Email"
               type="email"
               icon={Mail}
@@ -151,7 +168,7 @@ const Register = () => {
                 label="Password"
                 type={showPassword ? 'text' : 'password'}
                 icon={Lock}
-                placeholder="สร้างรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
+                placeholder="สร้างรหัสผ่าน (อย่างน้อย 8 ตัวอักษร)"
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 error={errors.password}

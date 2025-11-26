@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CreditCard, Wallet, QrCode, CheckCircle, ArrowLeft, Clock } from 'lucide-react'
 import { useBookingStore } from '../stores/bookingStore'
+import { bookingAPI } from '../utils/apiService'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import toast from 'react-hot-toast'
@@ -27,8 +28,10 @@ const Payment = () => {
     setLoading(true)
     
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Call real API to complete booking
+      if (booking?.id) {
+        await bookingAPI.completeBooking(booking.id)
+      }
       
       setSuccess(true)
       
@@ -41,7 +44,8 @@ const Payment = () => {
       
     } catch (error) {
       console.error('Payment error:', error)
-      toast.error('การชำระเงินล้มเหลว กรุณาลองใหม่')
+      const errorMessage = error.response?.data?.message || 'การชำระเงินล้มเหลว กรุณาลองใหม่'
+      toast.error(errorMessage)
       setLoading(false)
     }
   }
@@ -86,10 +90,12 @@ const Payment = () => {
     )
   }
 
-  const start = new Date(booking.startTime)
+  const start = new Date(booking.actualStartTime || booking.startTime)
   const now = new Date()
   const hoursElapsed = (now - start) / (1000 * 60 * 60)
-  const chargeableHours = Math.max(0, Math.ceil(hoursElapsed) - 1)
+  const freeHours = 3 // 3 ชม.แรกฟรี
+  const chargeableHours = Math.max(0, Math.ceil(hoursElapsed) - freeHours)
+  const bookingFee = booking.pricing?.bookingFee || 20 // ค่าจอง 20 บาท
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
@@ -334,14 +340,24 @@ const Payment = () => {
 
                     <div className="pt-4 border-t space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">ค่าจอด ({chargeableHours} ชม.)</span>
-                        <span className="font-bold">{cost} ฿</span>
+                        <span className="text-gray-600">ค่าจอง</span>
+                        <span className="font-bold text-blue-600">{bookingFee} ฿</span>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">3 ชม.แรก</span>
+                        <span className="font-bold text-green-600">ฟรี!</span>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">ค่าจอดเกิน ({chargeableHours} ชม.)</span>
+                        <span className="font-bold">{chargeableHours * (booking.pricing?.overtimeRate || 10)} ฿</span>
                       </div>
                       
                       {chargeableHours === 0 && (
                         <div className="bg-green-50 border-2 border-green-200 rounded-xl p-3">
                           <p className="text-green-800 text-sm font-semibold text-center">
-                            🎉 ชั่วโมงแรกฟรี!
+                            🎉 ยังอยู่ใน 3 ชม.แรกฟรี!
                           </p>
                         </div>
                       )}
@@ -350,7 +366,7 @@ const Payment = () => {
                     <div className="pt-4 border-t">
                       <div className="flex justify-between text-xl font-bold">
                         <span>ยอดชำระทั้งหมด</span>
-                        <span className="text-green-600">{cost} ฿</span>
+                        <span className="text-green-600">{bookingFee + (chargeableHours * (booking.pricing?.overtimeRate || 10))} ฿</span>
                       </div>
                     </div>
                   </div>
@@ -391,8 +407,9 @@ const Payment = () => {
               <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
                 <h4 className="font-bold text-blue-900 mb-2">💡 ข้อมูลเพิ่มเติม</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• ชั่วโมงแรกฟรี</li>
-                  <li>• ชั่วโมงถัดไปคิด {booking.price || 20} ฿/ชม.</li>
+                  <li>• ค่าจอง 20 บาท/ครั้ง</li>
+                  <li>• 3 ชม.แรกฟรี!</li>
+                  <li>• หลัง 3 ชม. คิด {booking.pricing?.overtimeRate || 10} ฿/ชม.</li>
                   <li>• สมาชิกได้รับส่วนลดเพิ่ม</li>
                 </ul>
               </div>

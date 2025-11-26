@@ -55,13 +55,25 @@ const bookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "active", "completed", "cancelled"],
-    default: "active",
+    enum: ["pending", "confirmed", "completed", "cancelled"],
+    default: "pending",
+  },
+  isCheckedIn: {
+    type: Boolean,
+    default: false, // ยืนยันว่ามาถึงที่จอดแล้ว
+  },
+  checkInDeadline: {
+    type: Date,
+    default: null, // ต้อง check-in ภายในเวลานี้ (30 นาทีหลังจอง)
   },
   cancelReason: {
     type: String,
     enum: ["user_cancelled", "auto_cancelled_timeout", "admin_cancelled"],
     default: null,
+  },
+  refundable: {
+    type: Boolean,
+    default: false, // ค่าจอง 20 บาทไม่คืน
   },
 }, { timestamps: true });
 

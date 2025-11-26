@@ -13,6 +13,9 @@ export const Badge = ({
     warning: 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white',
     danger: 'bg-gradient-to-r from-red-500 to-rose-500 text-white',
     info: 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white',
+    gray: 'bg-gray-100 text-gray-800',
+    blue: 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white',
+    purple: 'bg-gradient-to-r from-purple-500 to-violet-500 text-white',
   }
   
   const sizes = {

@@ -1,0 +1,55 @@
+# ===========================================
+# SciPark Docker Compose
+# ===========================================
+# For local development and testing
+
+version: '3.8'
+
+services:
+  # Full-Stack Application
+  scipark:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/scipark}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongo
+      - redis
+    restart: unless-stopped
+    networks:
+      - scipark-network
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+    networks:
+      - scipark-network
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - scipark-network
+
+networks:
+  scipark-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  redis-data:

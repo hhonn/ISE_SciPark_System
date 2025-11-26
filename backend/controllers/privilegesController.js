@@ -5,7 +5,7 @@ import PromoCode from "../models/promoCodeModel.js";
 // Get all tiers and user subscription
 export const getTiers = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const user = await User.findById(userId).select("-password");
     if (!user) {
@@ -89,7 +89,7 @@ export const getTiers = async (req, res) => {
 // Subscribe to tier
 export const subscribe = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const { tierId, paymentMethod = "credit" } = req.body;
 
     if (!tierId) {
@@ -168,7 +168,7 @@ export const subscribe = async (req, res) => {
 // Redeem promo code
 export const redeemCode = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const { code } = req.body;
 
     if (!code) {
