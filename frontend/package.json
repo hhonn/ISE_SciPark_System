@@ -10,12 +10,10 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@esbuild/win32-x64": "^0.25.12",
     "axios": "^1.6.5",
     "date-fns": "^3.0.6",
     "framer-motion": "^10.18.0",
     "lucide-react": "^0.303.0",
-    "node-cron": "^4.2.1",
     "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
